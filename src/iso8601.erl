@@ -402,8 +402,8 @@ apply_offset(Datetime, H, M, S) ->
     apply_offset(Datetime, H, M, S, "+").
 apply_offset(Datetime, H, M, S, Sign) ->
     SignApply = case Sign of
-        "+" -> 1;
-        "-" -> -1
+        "-" -> -1;
+        _ -> 1
     end,
     OffsetS = (S + (60 * (M + (60 * H)))) * SignApply,
     Gs = round(OffsetS) + calendar:datetime_to_gregorian_seconds(Datetime),
