@@ -143,12 +143,12 @@ parse_duration(Str) ->
 -spec apply_duration(datetime(), string()) -> datetime().
 %% @doc Return new datetime after apply duration.
 apply_duration(Datetime, Duration) ->
-    [{sign, _S}, {years, Y}, {months, M}, {days, D}, {hours, H},
+    [{sign, S}, {years, Y}, {months, M}, {days, D}, {hours, H},
      {minutes, MM}, {seconds, SS}] = parse_duration(Duration),
     D1 = apply_years_offset(Datetime, Y),
     D2 = apply_months_offset(D1, M),
     D3 = apply_days_offset(D2, D),
-    apply_offset(D3, H, MM, SS).
+    apply_offset(D3, H, MM, SS, S).
 
 %% Private functions
 
@@ -399,7 +399,13 @@ date_at_w01_1(Year) ->
             -> calendar:datetime().
 %% @doc Add the specified number of hours, minutes and seconds to `Datetime'.
 apply_offset(Datetime, H, M, S) ->
-    OffsetS = S + (60 * (M + (60 * H))),
+    apply_offset(Datetime, H, M, S, "+").
+apply_offset(Datetime, H, M, S, Sign) ->
+    SignApply = case Sign of
+        "+" -> 1;
+        "-" -> -1
+    end,
+    OffsetS = (S + (60 * (M + (60 * H)))) * SignApply,
     Gs = round(OffsetS) + calendar:datetime_to_gregorian_seconds(Datetime),
     calendar:gregorian_seconds_to_datetime(Gs).
 
